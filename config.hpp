@@ -5,6 +5,8 @@
 #ifndef SASHI_TINY_HTTP_CONFIG_HPP
 #define SASHI_TINY_HTTP_CONFIG_HPP
 
+#include <limits>
+
 namespace sashi_tiny_http {
 
     class Config {

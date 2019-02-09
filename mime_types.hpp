@@ -6,6 +6,7 @@
 #define STHS_MIME_TYPES_HPP
 
 #include <string>
+#include <vector>
 
 namespace sashi_tiny_http {
     using std::string;

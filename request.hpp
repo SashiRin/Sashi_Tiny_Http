@@ -6,6 +6,7 @@
 #define SASHI_TINY_HTTP_REQUEST_HPP
 
 #include <string>
+#include <tuple>
 #include "utility.hpp"
 #include "status_code.hpp"
 
