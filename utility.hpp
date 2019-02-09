@@ -38,6 +38,45 @@ namespace sashi_tiny_http {
     };
 
     using CaseInsensitiveMultimap = std::unordered_multimap<string, string, CaseInsensitiveHash, CaseInsensitiveEqual>;
+
+    static bool CheckIfChar(int c) {
+        return (c >= 0 && c <= 127);
+    }
+
+    static bool CheckIfCtl(int c) {
+        return ((c >= 0 && c <= 31) || c == 127);
+    }
+
+    static bool CheckIfTspecial(int c) {
+        switch (c) {
+            case '(':
+            case ')':
+            case '<':
+            case '>':
+            case '@':
+            case ',':
+            case ';':
+            case ':':
+            case '\\':
+            case '"':
+            case '/':
+            case '[':
+            case ']':
+            case '?':
+            case '=':
+            case '{':
+            case '}':
+            case ' ':
+            case '\t':
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    static bool CheckIfDigit(int c) {
+        return (c >= '0' && c <= '9');
+    }
 }
 
 #endif //SASHI_TINY_HTTP_UTILITY_HPP
