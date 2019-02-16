@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <sstream>
 
 namespace sashi_tiny_http {
     using std::size_t;
@@ -76,6 +77,46 @@ namespace sashi_tiny_http {
 
     static bool CheckIfDigit(int c) {
         return (c >= '0' && c <= '9');
+    }
+
+    struct HeaderItem {
+        string name;
+        string value;
+        void Clear() {
+            this->name.clear();
+            this->value.clear();
+        }
+    };
+
+    static bool DecodeUrl(const std::string &in, std::string &out) {
+        out.clear();
+        out.reserve(in.size());
+        for (std::size_t i = 0; i < in.length(); ++i) {
+            if (in[i] == '%') {
+                if (i + 3 <= in.length()) {
+                    int value = 0;
+                    std::istringstream is(in.substr(i + 1, 2));
+                    if (is >> std::hex >> value) {
+                        out.push_back(static_cast<char>(value));
+                        i += 2;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else if (in[i] == '+') {
+                out.push_back(' ');
+            } else {
+                out.push_back(in[i]);
+            }
+        }
+        return true;
+    }
+
+    namespace misc_strings {
+        const char name_value_separator[] = {':', ' '};
+        const char crlf[] = {'\r', '\n'};
     }
 }
 
