@@ -114,6 +114,16 @@ namespace sashi_tiny_http {
         return true;
     }
 
+    std::string GetPathExtension(const std::string &path) {
+        auto last_slash_pos = path.find_last_of('/');
+        auto last_dot_pos = path.find_last_of('.');
+        std::string extension;
+        if (last_slash_pos != std::string::npos && last_dot_pos > last_slash_pos) {
+            extension = path.substr(last_dot_pos + 1);
+        }
+        return extension;
+    }
+
     namespace misc_strings {
         const char name_value_separator[] = {':', ' '};
         const char crlf[] = {'\r', '\n'};
