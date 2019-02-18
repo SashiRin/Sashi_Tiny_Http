@@ -5,6 +5,7 @@
 #include "request.hpp"
 #include "mime_types.hpp"
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 namespace sashi_tiny_http {
     RequestParser::RequestParser() : state_(kMethodStart) {}
@@ -182,7 +183,7 @@ namespace sashi_tiny_http {
         }
 
         // Request path must be absolute and not contain ".."
-        if (request_path.empty() || request_path.front() != '/' || request_path.find("..") != request_path.npos) {
+        if (request_path.empty() || request_path.front() != '/' || request_path.find("..") != std::string::npos) {
             response = Response::StockReply(StatusCode::client_error_bad_request);
             return;
         }
@@ -192,10 +193,7 @@ namespace sashi_tiny_http {
         }
 
         // Determine the file extension
-        std::string extension = boost::filesystem::extension(request_path);
-        if (!extension.empty() && extension.front() == '.') {
-            extension = extension.substr(1);
-        }
+        std::string extension = GetPathExtension(request_path);
 
         // Open the file to send back
         std::string full_path = doc_root_ + request_path;
