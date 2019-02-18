@@ -27,6 +27,7 @@ namespace sashi_tiny_http {
             {"png", "image/png"},
             {"svg", "image/svg+xml"},
             {"bmp", "image/bmp"},
+            {"ico", "vnd.microsoft.icon"},
         };
 
         string ConvertExtensionToType(const string &extension) {
