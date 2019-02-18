@@ -114,7 +114,7 @@ namespace sashi_tiny_http {
         return true;
     }
 
-    std::string GetPathExtension(const std::string &path) {
+    static std::string GetPathExtension(const std::string &path) {
         auto last_slash_pos = path.find_last_of('/');
         auto last_dot_pos = path.find_last_of('.');
         std::string extension;
