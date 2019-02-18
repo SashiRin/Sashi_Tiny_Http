@@ -3,6 +3,8 @@
 //
 
 #include "request.hpp"
+#include "mime_types.hpp"
+#include <boost/filesystem.hpp>
 
 namespace sashi_tiny_http {
     RequestParser::RequestParser() : state_(kMethodStart) {}
@@ -167,6 +169,56 @@ namespace sashi_tiny_http {
             default:
                 return ResultType::kBad;
         }
+    }
+
+    RequestHandler::RequestHandler(const std::string &doc_root) : doc_root_(doc_root) {}
+
+    void RequestHandler::HandleRequest(const HttpRequest &request, Response &response) {
+        // Decode url to path
+        std::string request_path;
+        if (!DecodeUrl(request.uri, request_path)) {
+            response = Response::StockReply(StatusCode::client_error_bad_request);
+            return;
+        }
+
+        // Request path must be absolute and not contain ".."
+        if (request_path.empty() || request_path.front() != '/' || request_path.find("..") != request_path.npos) {
+            response = Response::StockReply(StatusCode::client_error_bad_request);
+            return;
+        }
+
+        if (request_path.back() == '/') {
+            request_path += "index.html";
+        }
+
+        // Determine the file extension
+        std::string extension = boost::filesystem::extension(request_path);
+        if (!extension.empty() && extension.front() == '.') {
+            extension = extension.substr(1);
+        }
+
+        // Open the file to send back
+        std::string full_path = doc_root_ + request_path;
+        std::ifstream ifs(full_path.c_str(), std::ios::in | std::ios::binary);
+        if (!ifs) {
+            response = Response::StockReply(StatusCode::client_error_not_found);
+            return;
+        }
+
+        // Fill out the response to be sent to the client
+        response.status = StatusCode::success_ok;
+        response.status_line = "HTTP/1.0 " + status_code_strings.at(response.status) + misc_strings::crlf;
+        char buffer[512];
+        while (ifs.read(buffer, sizeof(buffer)).gcount() > 0) {
+            response.content.append(buffer, ifs.gcount());
+        }
+        response.headers.resize(3);
+        response.headers[0].name = "Content-Length";
+        response.headers[0].value = std::to_string(response.content.length());
+        response.headers[1].name = "Content-Type";
+        response.headers[1].value = mime_types::ConvertExtensionToType(extension);
+        response.headers[2].name = "Server";
+        response.headers[2].value = "SashiTinyHttp";
     }
 }
 

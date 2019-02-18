@@ -9,6 +9,7 @@
 #include <tuple>
 #include "utility.hpp"
 #include "status_code.hpp"
+#include "response.hpp"
 
 namespace sashi_tiny_http {
     using std::string;
@@ -68,15 +69,22 @@ namespace sashi_tiny_http {
             kExpectingNewline3
         } state_;
 
-        struct HeaderItem {
-            string name;
-            string value;
-            void Clear() {
-                this->name.clear();
-                this->value.clear();
-            }
-        } header_item;
+        HeaderItem header_item;
 
+    };
+
+    class RequestHandler {
+    public:
+        RequestHandler(const RequestHandler &) = delete;
+
+        RequestHandler &operator=(const RequestHandler &) = delete;
+
+        explicit RequestHandler(const std::string &doc_root);
+
+        void HandleRequest(const HttpRequest &request, Response &response);
+
+    private:
+        std::string doc_root_;
     };
 }
 
