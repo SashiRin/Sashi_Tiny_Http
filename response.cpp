@@ -24,7 +24,7 @@ namespace sashi_tiny_http {
     Response Response::StockReply(StatusCode status) {
         Response response;
         response.status = status;
-        response.status_line = "HTTP/1.0" + status_code_strings.at(status) + misc_strings::crlf;
+        response.status_line = "HTTP/1.0 " + status_code_strings.at(status) + misc_strings::crlf;
         response.content = boost::str(boost::format(
             "<html>"
             "<head><title>%1%</title></head>"
