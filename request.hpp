@@ -33,13 +33,13 @@ namespace sashi_tiny_http {
 
         template<class InputIterator>
         std::tuple<ResultType, InputIterator> Parse(HttpRequest &request, InputIterator begin, InputIterator end) {
-
             while (begin != end) {
                 ResultType result = Consume(request, *begin++);
                 if (result == ResultType::kGood || result == ResultType::kBad) {
                     return std::make_tuple(result, begin);
                 }
             }
+            return std::make_tuple(ResultType::kIndeterminate, begin);
         }
 
     private:
