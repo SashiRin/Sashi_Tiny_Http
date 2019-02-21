@@ -21,8 +21,8 @@ namespace sashi_tiny_http {
 
         static std::size_t max_request_streambuf_size = std::numeric_limits<std::size_t>::max();
 
-        // max cache file size, default 20MB
-        static size_t max_cache_file_size = 20 * 1LL << 20;
+        // max cache file size, default 10MB
+        static size_t max_cache_file_size = 10 * 1LL << 20;
 
     }
 }
