@@ -195,21 +195,29 @@ namespace sashi_tiny_http {
         // Determine the file extension
         std::string extension = GetPathExtension(request_path);
 
-        // Open the file to send back
-        std::string full_path = doc_root_ + request_path;
-        std::ifstream ifs(full_path.c_str(), std::ios::in | std::ios::binary);
-        if (!ifs) {
-            response = Response::StockReply(StatusCode::client_error_not_found);
-            return;
+        // If file is in the cache, directly return it
+        if (file_cache_.count(request_path)) {
+            response.content.append(file_cache_.at(request_path));
+        } else {
+            // Open the file to send back
+            std::string full_path = doc_root_ + request_path;
+            std::ifstream ifs(full_path.c_str(), std::ios::in | std::ios::binary);
+            if (!ifs) {
+                response = Response::StockReply(StatusCode::client_error_not_found);
+                return;
+            }
+
+            // Fill out the response to be sent to the client
+            response.status = StatusCode::success_ok;
+            response.status_line = "HTTP/1.0 " + status_code_strings.at(response.status) + misc_strings::crlf;
+            char buffer[512];
+            while (ifs.read(buffer, sizeof(buffer)).gcount() > 0) {
+                response.content.append(buffer, ifs.gcount());
+            }
+            // Add to the cache
+            file_cache_[request_path] = response.content;
         }
 
-        // Fill out the response to be sent to the client
-        response.status = StatusCode::success_ok;
-        response.status_line = "HTTP/1.0 " + status_code_strings.at(response.status) + misc_strings::crlf;
-        char buffer[512];
-        while (ifs.read(buffer, sizeof(buffer)).gcount() > 0) {
-            response.content.append(buffer, ifs.gcount());
-        }
         response.headers.resize(3);
         response.headers[0].name = "Content-Length";
         response.headers[0].value = std::to_string(response.content.length());

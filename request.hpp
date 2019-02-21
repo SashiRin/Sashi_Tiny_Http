@@ -7,6 +7,7 @@
 
 #include <string>
 #include <tuple>
+#include <map>
 #include "utility.hpp"
 #include "status_code.hpp"
 #include "response.hpp"
@@ -85,6 +86,8 @@ namespace sashi_tiny_http {
 
     private:
         std::string doc_root_;
+
+        std::map<string, string> file_cache_;
     };
 }
 
