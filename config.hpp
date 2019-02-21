@@ -9,23 +9,22 @@
 
 namespace sashi_tiny_http {
 
-    class Config {
+    namespace config {
 
-        Config(unsigned short _port) : port(_port) {}
+        static std::string address;
 
-    public:
+        static unsigned short port;
 
-        std::string address;
+        static long timeout_request = 5;
 
-        unsigned short port;
+        static long timeout_content = 300;
 
-        long timeout_request = 5;
+        static std::size_t max_request_streambuf_size = std::numeric_limits<std::size_t>::max();
 
-        long timeout_content = 300;
+        // max cache file size, default 20MB
+        static size_t max_cache_file_size = 20 * 1LL << 20;
 
-        std::size_t max_request_streambuf_size = std::numeric_limits<std::size_t>::max();
-
-    };
+    }
 }
 
 #endif //SASHI_TINY_HTTP_CONFIG_HPP
