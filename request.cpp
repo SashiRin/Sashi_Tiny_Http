@@ -4,6 +4,7 @@
 
 #include "request.hpp"
 #include "mime_types.hpp"
+#include "config.hpp"
 #include <boost/filesystem.hpp>
 #include <iostream>
 
@@ -215,7 +216,9 @@ namespace sashi_tiny_http {
                 response.content.append(buffer, ifs.gcount());
             }
             // Add to the cache
-            file_cache_[request_path] = response.content;
+            if (response.content.length() <= config::max_cache_file_size) {
+                file_cache_[request_path] = response.content;
+            }
         }
 
         response.headers.resize(3);
