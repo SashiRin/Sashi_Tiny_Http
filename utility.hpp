@@ -194,7 +194,6 @@ namespace sashi_tiny_http {
             ).count();
             for (auto it = m.cbegin(); it != m.cend();) {
                 if (curr_time_ms - it->second.begin_ > duration_) {
-//                    std::cout << it->second.key_ << " " << it->second.value_ << std::endl;
                     m.erase(it++);
                 } else {
                     ++it;
