@@ -14,12 +14,21 @@
 
 namespace sashi_tiny_http {
     using std::string;
-    struct Request {
+    class Request {
+    public:
         string method;
         string uri;
         int http_version_major = 0;
         int http_version_minor = 0;
         CaseInsensitiveMultimap headers;
+
+        void reset() {
+            method.clear();
+            uri.clear();
+            http_version_major = 0;
+            http_version_minor = 0;
+            headers.clear();
+        }
     };
 
     class RequestParser {
@@ -31,6 +40,10 @@ namespace sashi_tiny_http {
             kBad,
             kIndeterminate
         };
+
+        void reset() {
+            state_ = kMethodStart;
+        }
 
         template<class InputIterator>
         std::tuple<ResultType, InputIterator> Parse(Request &request, InputIterator begin, InputIterator end) {

@@ -12,6 +12,7 @@ namespace sashi_tiny_http {
     RequestParser::RequestParser() : state_(kMethodStart) {}
 
     RequestParser::ResultType RequestParser::Consume(Request &request, char input) {
+//        std::cout << input;
         switch (state_) {
             case kMethodStart:
                 if (!CheckIfChar(input) || CheckIfCtl(input) || CheckIfTspecial(input)) {
@@ -200,8 +201,8 @@ namespace sashi_tiny_http {
         string request_value;
         if (file_cache_.get(request_path, request_value)) {
             response.status = StatusCode::success_ok;
-            response.status_line = "HTTP/1.0 " + status_code_strings.at(response.status) + misc_strings::crlf;
-            response.content.append(request_value);
+            response.status_line = "HTTP/1.1 " + status_code_strings.at(response.status) + misc_strings::crlf;
+            response.content = request_value;
         } else {
             // Open the file to send back
             std::string full_path = doc_root_ + request_path;
@@ -213,7 +214,8 @@ namespace sashi_tiny_http {
 
             // Fill out the response to be sent to the client
             response.status = StatusCode::success_ok;
-            response.status_line = "HTTP/1.0 " + status_code_strings.at(response.status) + misc_strings::crlf;
+            response.status_line = "HTTP/1.1 " + status_code_strings.at(response.status) + misc_strings::crlf;
+            response.content.clear();
             char buffer[512];
             while (ifs.read(buffer, sizeof(buffer)).gcount() > 0) {
                 response.content.append(buffer, ifs.gcount());
@@ -224,13 +226,17 @@ namespace sashi_tiny_http {
             }
         }
 
-        response.headers.resize(3);
+        response.headers.resize(5);
         response.headers[0].name = "Content-Length";
         response.headers[0].value = std::to_string(response.content.length());
         response.headers[1].name = "Content-Type";
         response.headers[1].value = mime_types::ConvertExtensionToType(extension);
-        response.headers[2].name = "Server";
-        response.headers[2].value = "SashiTinyHttp";
+        response.headers[2].name = "Connection";
+        response.headers[2].value = "keep-alive";
+        response.headers[3].name = "Cache-Control";
+        response.headers[3].value = "max-age=86400";
+        response.headers[4].name = "Server";
+        response.headers[4].value = "SashiTinyHttp";
     }
 
     void RequestHandler::StopFileCache() {
