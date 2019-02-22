@@ -15,9 +15,7 @@ namespace sashi_tiny_http {
 
         static unsigned short port;
 
-        static long timeout_request = 5;
-
-        static long timeout_content = 300;
+        static long timeout_request = 30;
 
         static std::size_t max_request_streambuf_size = std::numeric_limits<std::size_t>::max();
 
@@ -26,6 +24,9 @@ namespace sashi_tiny_http {
 
         // cache file expire time, default 60s
         static long long cache_file_duration = 60000;
+
+        // TCP FAST OPEN
+        static bool fast_open = true;
 
     }
 }
