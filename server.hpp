@@ -9,6 +9,7 @@
 #include "connection_manager.hpp"
 #include "connection.hpp"
 #include "config.hpp"
+#include <boost/thread.hpp>
 
 namespace sashi_tiny_http {
     class Server {
@@ -36,6 +37,8 @@ namespace sashi_tiny_http {
         ConnectionManager connection_manager_;
 
         RequestHandler request_handler_;
+
+        boost::thread expiremap_timer_thread_;
     };
 }
 

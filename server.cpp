@@ -12,7 +12,8 @@ namespace sashi_tiny_http {
     signals_(io_context_),
     acceptor_(io_context_),
     connection_manager_(),
-    request_handler_(io_context_, doc_root) {
+    request_handler_(io_context_, doc_root),
+    expiremap_timer_thread_(boost::bind(&boost::asio::io_context::run, &io_context_)) {
 
         signals_.add(SIGINT);
         signals_.add(SIGTERM);
@@ -33,9 +34,7 @@ namespace sashi_tiny_http {
     }
 
     void Server::Run() {
-        boost::thread t(boost::bind(&boost::asio::io_context::run, &io_context_));
         io_context_.run();
-        t.join();
     }
 
     void Server::DoAccept() {
@@ -58,6 +57,8 @@ namespace sashi_tiny_http {
             [this](boost::system::error_code, int) {
                 acceptor_.close();
                 connection_manager_.StopAll();
+                request_handler_.StopFileCache();
+                pthread_kill(expiremap_timer_thread_.native_handle(), 9);
             });
     }
 }
