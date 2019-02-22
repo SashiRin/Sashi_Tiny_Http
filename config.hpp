@@ -24,6 +24,9 @@ namespace sashi_tiny_http {
         // max cache file size, default 10MB
         static size_t max_cache_file_size = 10 * 1LL << 20;
 
+        // cache file expire time, default 60s
+        static long long cache_file_duration = 60000;
+
     }
 }
 
