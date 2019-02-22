@@ -7,7 +7,12 @@
 
 #include <unordered_map>
 #include <string>
+#include <map>
 #include <sstream>
+#include <mutex>
+#include <chrono>
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
 
 namespace sashi_tiny_http {
     using std::size_t;
@@ -128,6 +133,78 @@ namespace sashi_tiny_http {
         const char name_value_separator[] = {':', ' '};
         const char crlf[] = {'\r', '\n'};
     }
+
+    template <class K, class V>
+    class ExpireItem {
+    public:
+        ExpireItem(K key, V value, long long begin) : key_(key), value_(value), begin_(begin) {}
+        ExpireItem() {}
+        K key_;
+        V value_;
+        long long begin_;
+    };
+
+    template <class K, class V>
+    class ExpireMap {
+    public:
+        ExpireMap(boost::asio::io_context &io, long long duration) : strand_(io), duration_(duration), timer_(io, boost::asio::chrono::milliseconds(duration / 2)) {
+            timer_.async_wait(boost::bind(&ExpireMap::check, this));
+        }
+
+        void insert(K key, V value) {
+            using namespace std::chrono;
+            long long curr_time_ms = duration_cast<milliseconds>(
+                system_clock::now().time_since_epoch()
+            ).count();
+            ExpireItem<K, V> item(key, value, curr_time_ms);
+            std::unique_lock<std::mutex> lock(mtx);
+            m[key] = item;
+        }
+
+        bool get(K key, V &value) {
+            std::unique_lock<std::mutex> lock(mtx);
+            if (!m.count(key)) {
+                return false;
+            } else {
+                using namespace std::chrono;
+                long long curr_time_ms = duration_cast<milliseconds>(
+                    system_clock::now().time_since_epoch()
+                ).count();
+                if (curr_time_ms - m.at(key).begin_ > duration_) {
+                    return false;
+                } else {
+                    value = m.at(key).value_;
+                    return true;
+                }
+            }
+        }
+
+    private:
+        long long duration_;
+        mutable std::mutex mtx;
+        std::map<K, ExpireItem<K, V>> m;
+        boost::asio::io_context::strand strand_;
+        boost::asio::steady_timer timer_;
+
+        void check() {
+            std::unique_lock<std::mutex> lock(mtx);
+            using namespace std::chrono;
+            long long curr_time_ms = duration_cast<milliseconds>(
+                system_clock::now().time_since_epoch()
+            ).count();
+            for (auto it = m.cbegin(); it != m.cend();) {
+                if (curr_time_ms - it->second.begin_ > duration_) {
+//                    std::cout << it->second.key_ << " " << it->second.value_ << std::endl;
+                    m.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+
+            timer_.expires_at(timer_.expiry() + boost::asio::chrono::milliseconds(duration_ / 2));
+            timer_.async_wait(boost::bind(&ExpireMap::check, this));
+        }
+    };
 }
 
 #endif //SASHI_TINY_HTTP_UTILITY_HPP
