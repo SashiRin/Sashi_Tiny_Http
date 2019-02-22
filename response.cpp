@@ -24,19 +24,21 @@ namespace sashi_tiny_http {
     Response Response::StockReply(StatusCode status) {
         Response response;
         response.status = status;
-        response.status_line = "HTTP/1.0 " + status_code_strings.at(status) + misc_strings::crlf;
+        response.status_line = "HTTP/1.1 " + status_code_strings.at(status) + misc_strings::crlf;
         response.content = boost::str(boost::format(
             "<html>"
             "<head><title>%1%</title></head>"
             "<body><h1>%2%</h1></body>"
             "</html>") % status_code_strings.at(status) % status_code_strings.at(status));
-        response.headers.resize(3);
+        response.headers.resize(4);
         response.headers[0].name = "Content-Length";
         response.headers[0].value = std::to_string(response.content.length());
         response.headers[1].name = "Content-Type";
         response.headers[1].value = "text/html";
-        response.headers[2].name = "Server";
-        response.headers[2].value = "SashiTinyHttp";
+        response.headers[2].name = "Connection";
+        response.headers[2].value = "close";
+        response.headers[3].name = "Server";
+        response.headers[3].value = "SashiTinyHttp";
         return response;
     }
 }
