@@ -13,6 +13,7 @@
 #include <chrono>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <iostream>
 
 namespace sashi_tiny_http {
     using std::size_t;
@@ -177,6 +178,10 @@ namespace sashi_tiny_http {
                     return true;
                 }
             }
+        }
+
+        void stop() {
+            timer_.cancel();
         }
 
     private:
