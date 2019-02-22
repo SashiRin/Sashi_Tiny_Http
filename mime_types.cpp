@@ -21,13 +21,19 @@ namespace sashi_tiny_http {
             {"js", "application/javascript"},
             {"json", "application/json"},
             {"xml", "application/xml"},
+            {"bmp", "image/bmp"},
             {"gif", "image/gif"},
             {"jpg", "image/jpeg"},
+            {"jpe", "image/jpeg"},
             {"jpeg", "image/jpeg"},
             {"png", "image/png"},
             {"svg", "image/svg+xml"},
-            {"bmp", "image/bmp"},
+            {"svgz", "image/svg+xml"},
+            {"tiff", "image/tiff"},
+            {"tif", "image/tiff"},
             {"ico", "vnd.microsoft.icon"},
+            {"swf", "application/x-shockwave-flash"},
+            {"flv", "video/x-flv"},
         };
 
         string ConvertExtensionToType(const string &extension) {
