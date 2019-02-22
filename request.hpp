@@ -83,6 +83,8 @@ namespace sashi_tiny_http {
         explicit RequestHandler(boost::asio::io_context &io, const std::string &doc_root);
 
         void HandleRequest(const HttpRequest &request, Response &response);
+        
+        void StopFileCache();
 
     private:
         std::string doc_root_;

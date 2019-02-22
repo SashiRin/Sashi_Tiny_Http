@@ -232,5 +232,9 @@ namespace sashi_tiny_http {
         response.headers[2].name = "Server";
         response.headers[2].value = "SashiTinyHttp";
     }
+
+    void RequestHandler::StopFileCache() {
+        file_cache_.stop();
+    }
 }
 
