@@ -80,6 +80,7 @@ namespace sashi_tiny_http {
         auto self = shared_from_this();
         timer->async_wait([self](const boost::system::error_code &ec) {
             if (!ec) {
+                self->connection_manager_.Stop(self);
                 self->Stop();
             }
         });
