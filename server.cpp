@@ -27,6 +27,15 @@ namespace sashi_tiny_http {
         boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(address, port).begin();
         acceptor_.open(endpoint.protocol());
         acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+
+        if (config::fast_open) {
+#if defined(__linux__) && defined(TCP_FASTOPEN)
+            const int qlen = 5; // This seems to be the value that is used in other examples.
+            error_code ec;
+            acceptor->set_option(asio::detail::socket_option::integer<IPPROTO_TCP, TCP_FASTOPEN>(qlen), ec);
+#endif // End Linux
+        }
+
         acceptor_.bind(endpoint);
         acceptor_.listen();
 
@@ -45,7 +54,11 @@ namespace sashi_tiny_http {
                 }
 
                 if (!ec) {
+//                    auto endpoint = socket.lowest_layer().remote_endpoint();
+//                    string endpoint_str = endpoint.address().to_string() + " " + std::to_string(endpoint.port());
+//                    std::cout << endpoint_str << std::endl;
                     connection_manager_.Start(std::make_shared<Connection>(std::move(socket), connection_manager_, request_handler_));
+
                 }
 
                 DoAccept();
