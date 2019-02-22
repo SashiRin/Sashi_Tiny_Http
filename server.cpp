@@ -3,6 +3,7 @@
 //
 
 #include "server.hpp"
+#include <boost/thread.hpp>
 
 namespace sashi_tiny_http {
 
@@ -11,7 +12,7 @@ namespace sashi_tiny_http {
     signals_(io_context_),
     acceptor_(io_context_),
     connection_manager_(),
-    request_handler_(doc_root) {
+    request_handler_(io_context_, doc_root) {
 
         signals_.add(SIGINT);
         signals_.add(SIGTERM);
@@ -32,7 +33,9 @@ namespace sashi_tiny_http {
     }
 
     void Server::Run() {
+        boost::thread t(boost::bind(&boost::asio::io_context::run, &io_context_));
         io_context_.run();
+        t.join();
     }
 
     void Server::DoAccept() {

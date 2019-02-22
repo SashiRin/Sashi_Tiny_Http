@@ -80,14 +80,14 @@ namespace sashi_tiny_http {
 
         RequestHandler &operator=(const RequestHandler &) = delete;
 
-        explicit RequestHandler(const std::string &doc_root);
+        explicit RequestHandler(boost::asio::io_context &io, const std::string &doc_root);
 
         void HandleRequest(const HttpRequest &request, Response &response);
 
     private:
         std::string doc_root_;
 
-        std::map<string, string> file_cache_;
+        ExpireMap<string, string> file_cache_;
     };
 }
 

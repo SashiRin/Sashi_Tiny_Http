@@ -173,7 +173,7 @@ namespace sashi_tiny_http {
         }
     }
 
-    RequestHandler::RequestHandler(const std::string &doc_root) : doc_root_(doc_root) {}
+    RequestHandler::RequestHandler(boost::asio::io_context &io, const std::string &doc_root) : file_cache_(io, config::cache_file_duration), doc_root_(doc_root) {}
 
     void RequestHandler::HandleRequest(const HttpRequest &request, Response &response) {
         // Decode url to path
@@ -197,8 +197,11 @@ namespace sashi_tiny_http {
         std::string extension = GetPathExtension(request_path);
 
         // If file is in the cache, directly return it
-        if (file_cache_.count(request_path)) {
-            response.content.append(file_cache_.at(request_path));
+        string request_value;
+        if (file_cache_.get(request_path, request_value)) {
+            response.status = StatusCode::success_ok;
+            response.status_line = "HTTP/1.0 " + status_code_strings.at(response.status) + misc_strings::crlf;
+            response.content.append(request_value);
         } else {
             // Open the file to send back
             std::string full_path = doc_root_ + request_path;
@@ -217,7 +220,7 @@ namespace sashi_tiny_http {
             }
             // Add to the cache
             if (response.content.length() <= config::max_cache_file_size) {
-                file_cache_[request_path] = response.content;
+                file_cache_.insert(request_path, response.content);
             }
         }
 
