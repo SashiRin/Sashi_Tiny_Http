@@ -1,3 +1,5 @@
+#include <memory>
+
 //
 // Created by SashiRin on 2019-02-18.
 //
@@ -30,13 +32,21 @@ namespace sashi_tiny_http {
         /// Stop all asynchronous operations associated with the connection.
         void Stop();
 
+        void SetTimeout(long long seconds);
+
+        void CancelTimeout();
+
+        std::shared_ptr<boost::asio::ip::tcp::endpoint> remote_endpoint_;
+
+        boost::asio::ip::tcp::socket socket_;
+
+        std::unique_ptr<boost::asio::steady_timer> timer;
+
     private:
 
         void DoRead();
 
         void DoWrite();
-
-        boost::asio::ip::tcp::socket socket_;
 
         ConnectionManager &connection_manager_;
 
@@ -44,7 +54,7 @@ namespace sashi_tiny_http {
 
         RequestParser request_parser_;
 
-        HttpRequest request_;
+        Request request_;
 
         Response response_;
 
