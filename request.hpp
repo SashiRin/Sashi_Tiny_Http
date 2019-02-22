@@ -14,7 +14,7 @@
 
 namespace sashi_tiny_http {
     using std::string;
-    struct HttpRequest {
+    struct Request {
         string method;
         string uri;
         int http_version_major = 0;
@@ -33,7 +33,7 @@ namespace sashi_tiny_http {
         };
 
         template<class InputIterator>
-        std::tuple<ResultType, InputIterator> Parse(HttpRequest &request, InputIterator begin, InputIterator end) {
+        std::tuple<ResultType, InputIterator> Parse(Request &request, InputIterator begin, InputIterator end) {
             while (begin != end) {
                 ResultType result = Consume(request, *begin++);
                 if (result == ResultType::kGood || result == ResultType::kBad) {
@@ -45,7 +45,7 @@ namespace sashi_tiny_http {
 
     private:
 
-        ResultType Consume(HttpRequest &request, char input);
+        ResultType Consume(Request &request, char input);
 
         enum state {
             kMethodStart,
@@ -82,8 +82,8 @@ namespace sashi_tiny_http {
 
         explicit RequestHandler(boost::asio::io_context &io, const std::string &doc_root);
 
-        void HandleRequest(const HttpRequest &request, Response &response);
-        
+        void HandleRequest(const Request &request, Response &response);
+
         void StopFileCache();
 
     private:

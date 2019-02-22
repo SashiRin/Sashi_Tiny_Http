@@ -11,7 +11,7 @@
 namespace sashi_tiny_http {
     RequestParser::RequestParser() : state_(kMethodStart) {}
 
-    RequestParser::ResultType RequestParser::Consume(HttpRequest &request, char input) {
+    RequestParser::ResultType RequestParser::Consume(Request &request, char input) {
         switch (state_) {
             case kMethodStart:
                 if (!CheckIfChar(input) || CheckIfCtl(input) || CheckIfTspecial(input)) {
@@ -175,7 +175,7 @@ namespace sashi_tiny_http {
 
     RequestHandler::RequestHandler(boost::asio::io_context &io, const std::string &doc_root) : file_cache_(io, config::cache_file_duration), doc_root_(doc_root) {}
 
-    void RequestHandler::HandleRequest(const HttpRequest &request, Response &response) {
+    void RequestHandler::HandleRequest(const Request &request, Response &response) {
         // Decode url to path
         std::string request_path;
         if (!DecodeUrl(request.uri, request_path)) {
