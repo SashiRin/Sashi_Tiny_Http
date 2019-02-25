@@ -169,13 +169,11 @@ namespace sashi_tiny_http {
                 system_clock::now().time_since_epoch()
             ).count();
             ExpireItem<K, V> item(key, value, curr_time_ms);
-            std::unique_lock<std::mutex> lock(mtx);
             m.insert(std::pair<K, ExpireItem<K, V>>(key, item));
 //            m[key] = item;
         }
 
         bool get(K key, V &value) {
-            std::unique_lock<std::mutex> lock(mtx);
             if (!m.count(key)) {
                 return false;
             } else {
@@ -202,13 +200,11 @@ namespace sashi_tiny_http {
 
     private:
         long long duration_;
-        mutable std::mutex mtx;
         std::map<K, ExpireItem<K, V>> m;
         bool close = false;
         std::unique_ptr<boost::asio::steady_timer> timer_;
 
         void check() {
-            std::unique_lock<std::mutex> lock(mtx);
             using namespace std::chrono;
             long long curr_time_ms = duration_cast<milliseconds>(
                 system_clock::now().time_since_epoch()
