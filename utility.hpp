@@ -148,8 +148,19 @@ namespace sashi_tiny_http {
     template <class K, class V>
     class ExpireMap {
     public:
-        ExpireMap(boost::asio::io_context &io, long long duration) : strand_(io), duration_(duration), timer_(io, boost::asio::chrono::milliseconds(duration / 2)) {
-            timer_.async_wait(boost::bind(&ExpireMap::check, this));
+        ExpireMap(boost::asio::io_context &io, long long duration) : duration_(duration) {
+            if (duration == 0) {
+                timer_ = nullptr;
+                return;
+            }
+
+            timer_ = std::make_unique<boost::asio::steady_timer>(io);
+            timer_->expires_from_now(std::chrono::milliseconds(duration_ / 2));
+            timer_->async_wait([this](const boost::system::error_code &ec) {
+                if (!ec) {
+                    this->check();
+                }
+            });
         }
 
         void insert(K key, V value) {
@@ -159,7 +170,8 @@ namespace sashi_tiny_http {
             ).count();
             ExpireItem<K, V> item(key, value, curr_time_ms);
             std::unique_lock<std::mutex> lock(mtx);
-            m[key] = item;
+            m.insert(std::pair<K, ExpireItem<K, V>>(key, item));
+//            m[key] = item;
         }
 
         bool get(K key, V &value) {
@@ -181,15 +193,19 @@ namespace sashi_tiny_http {
         }
 
         void stop() {
-            timer_.cancel();
+            if (timer_) {
+                boost::system::error_code ec;
+                timer_->cancel(ec);
+                close = true;
+            }
         }
 
     private:
         long long duration_;
         mutable std::mutex mtx;
         std::map<K, ExpireItem<K, V>> m;
-        boost::asio::io_context::strand strand_;
-        boost::asio::steady_timer timer_;
+        bool close = false;
+        std::unique_ptr<boost::asio::steady_timer> timer_;
 
         void check() {
             std::unique_lock<std::mutex> lock(mtx);
@@ -205,8 +221,10 @@ namespace sashi_tiny_http {
                 }
             }
 
-            timer_.expires_at(timer_.expiry() + boost::asio::chrono::milliseconds(duration_ / 2));
-            timer_.async_wait(boost::bind(&ExpireMap::check, this));
+            if (!close) {
+                timer_->expires_at(timer_->expiry() + std::chrono::milliseconds(duration_ / 2));
+                timer_->async_wait(boost::bind(&ExpireMap::check, this));
+            }
         }
     };
 }
