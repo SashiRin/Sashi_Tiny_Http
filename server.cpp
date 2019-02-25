@@ -12,8 +12,7 @@ namespace sashi_tiny_http {
     signals_(io_context_),
     acceptor_(io_context_),
     connection_manager_(),
-    request_handler_(io_context_, doc_root),
-    expiremap_timer_thread_(boost::bind(&boost::asio::io_context::run, &io_context_)) {
+    request_handler_(io_context_, doc_root) {
 
         signals_.add(SIGINT);
         signals_.add(SIGTERM);
@@ -54,9 +53,6 @@ namespace sashi_tiny_http {
                 }
 
                 if (!ec) {
-//                    auto endpoint = socket.lowest_layer().remote_endpoint();
-//                    string endpoint_str = endpoint.address().to_string() + " " + std::to_string(endpoint.port());
-//                    std::cout << endpoint_str << std::endl;
                     connection_manager_.Start(std::make_shared<Connection>(std::move(socket), connection_manager_, request_handler_));
 
                 }
@@ -71,7 +67,6 @@ namespace sashi_tiny_http {
                 acceptor_.close();
                 connection_manager_.StopAll();
                 request_handler_.StopFileCache();
-                pthread_kill(expiremap_timer_thread_.native_handle(), 9);
             });
     }
 }
