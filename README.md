@@ -12,11 +12,11 @@ A tiny, fast, platform-independent static HTTP server library implemented using 
 
 ### Usage
 
-See main.cpp for example usage. 
+See [main.cpp](main.cpp) for example usage. 
 
 ### Dependencies
 
-* Boost.Asio
+* Boost ASIO
 * Boost is required to compile the examples
 
 ### Compile and run
