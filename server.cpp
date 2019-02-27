@@ -30,8 +30,8 @@ namespace sashi_tiny_http {
         if (config::fast_open) {
 #if defined(__linux__) && defined(TCP_FASTOPEN)
             const int qlen = 5; // This seems to be the value that is used in other examples.
-            error_code ec;
-            acceptor->set_option(asio::detail::socket_option::integer<IPPROTO_TCP, TCP_FASTOPEN>(qlen), ec);
+            boost::system::error_code ec;
+            acceptor_.set_option(boost::asio::detail::socket_option::integer<IPPROTO_TCP, TCP_FASTOPEN>(qlen), ec);
 #endif // End Linux
         }
 
