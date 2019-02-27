@@ -2,6 +2,7 @@ Sashi Tiny Http
 =================
 
 A tiny, fast, platform-independent static HTTP server library implemented using C++ and Boost ASIO.
+Inspired heavily from [Simple-Web-Server](https://gitlab.com/eidheim/Simple-Web-Server) and Boost ASIO documentation.
 
 ### Features
 
