@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(Sashi_Tiny_Http)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(Boost 1.53.0 COMPONENTS system thread filesystem REQUIRED)
 
