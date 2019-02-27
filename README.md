@@ -29,3 +29,10 @@ cmake ..
 make
 cd ..
 ```
+
+### TODO
+
+* HTTPS
+* HTTP/2
+* QUIC
+* POST support
