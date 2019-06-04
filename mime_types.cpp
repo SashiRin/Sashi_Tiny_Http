@@ -31,6 +31,7 @@ namespace sashi_tiny_http {
             {"svgz", "image/svg+xml"},
             {"tiff", "image/tiff"},
             {"tif", "image/tiff"},
+            {"webp", "image/webp"},
             {"ico", "vnd.microsoft.icon"},
             {"swf", "application/x-shockwave-flash"},
             {"flv", "video/x-flv"},
